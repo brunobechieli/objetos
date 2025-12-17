@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FVC_Wrapped_2025_CI_CA2</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700;800&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background-color: #011E38;
+      color: #FFBC82;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #app-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: calc(100vh * (9/16));
+      background-color: transparent;
+      overflow: hidden;
+      box-shadow: 0 0 50px rgba(0,0,0,0.5);
+    }
+
+    .fvc-background {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, #011E38 0%, #011E38 70%, #264FEC 100%);
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .fvc-grid {
+      position: absolute; inset: 0;
+      display: flex; justify-content: space-around;
+      z-index: 1;
+    }
+    .fvc-column {
+      display: flex; flex-direction: column;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-weight: 800; font-size: 2rem; line-height: 1.1;
+      color: rgba(255, 255, 255, 0.05);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    .scroll-content { display: flex; flex-direction: column; }
+    .fvc-column span { display: block; padding: 8px 0; }
+    
+    .fvc-column:nth-child(odd) .scroll-content { animation: scrollUp 40s linear infinite; }
+    .fvc-column:nth-child(even) .scroll-content { animation: scrollDown 40s linear infinite; }
+
+    @keyframes scrollUp { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
+    @keyframes scrollDown { 0% { transform: translateY(-50%); } 100% { transform: translateY(0); } }
+
+    .text-pink { color: #FF5EC9; }
+    .text-peach { color: #FFBC82; }
+    .gradient-text {
+      background: linear-gradient(to right, #FF5EC9, #FFBC82);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+    }
+
+    .slide {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0; pointer-events: none; z-index: 10;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 1.5rem; transform: scale(0.95);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; z-index: 20; transform: scale(1); }
+
+    .step-wrapper { position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .step-item {
+      position: absolute; top: 55%; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.2rem;
+      opacity: 0; transform: translateY(60vh) scale(0.8);
+      transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none;
+    }
+    .step-item.active { opacity: 1; transform: translateY(-50%) scale(1); z-index: 30; }
+    .step-item.seen { opacity: 0; transform: translateY(-100vh) scale(0.9); filter: blur(5px); }
+
+    h1, h2, h3, p { text-transform: uppercase; }
+    h1 { font-size: clamp(1.2rem, 6vw, 2.2rem); line-height: 1; letter-spacing: -1px; font-weight: 800; text-align: center; color: #FFBC82; }
+    h2 { font-size: clamp(1.1rem, 5vw, 2rem); line-height: 1.1; letter-spacing: -1px; font-weight: 800; text-align: center; color: #FFBC82; }
+    
+    .step-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.4em; color: #F5F1EB; opacity: 0.7; margin-bottom: 0.2rem; }
+    .step-highlight { font-size: clamp(1.8rem, 8vw, 3.5rem); font-weight: 800; line-height: 0.95; margin-bottom: 0.2rem; text-align: center; color: #F5F1EB; letter-spacing: -1px; width: 90%; word-break: break-word; }
+    .step-highlight.pink { color: #FF5EC9; }
+    .step-desc { font-size: clamp(0.8rem, 3.2vw, 1.1rem); font-weight: 700; opacity: 1; line-height: 1.2; text-align: center; max-width: 85%; color: #FFBC82; }
+
+    .transition-bands {
+      position: absolute; inset: 0; z-index: 2000; pointer-events: none; overflow: hidden;
+    }
+    .band { position: absolute; left: 0; width: 100%; height: 100%; transform: translateY(100%); }
+    .band-1 { background: #FF5EC9; z-index: 3; }
+    .band-2 { background: #264FEC; z-index: 2; }
+    .band-3 { background: #FFBC82; z-index: 1; }
+
+    @keyframes bandUp {
+      0% { transform: translateY(100%); }
+      100% { transform: translateY(-100%); }
+    }
+    .animate-bands .band-1 { animation: bandUp 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+    .animate-bands .band-2 { animation: bandUp 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.15s forwards; }
+    .animate-bands .band-3 { animation: bandUp 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.3s forwards; }
+
+    #confetti-canvas { position: absolute; inset: 0; z-index: 95; pointer-events: none; }
+
+    .advance-btn {
+      position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+      z-index: 100; background: #264FEC; color: white; border: none;
+      padding: 10px 20px; border-radius: 99px; font-weight: 800; font-size: 0.55rem;
+      text-transform: uppercase; letter-spacing: 1px; cursor: pointer;
+      box-shadow: 0 8px 25px rgba(38, 79, 236, 0.4);
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
+      animation: pulseBtn 2s infinite; transition: transform 0.2s, background 0.2s, opacity 0.5s;
+    }
+    .advance-btn svg { width: 16px; height: 16px; }
+    @keyframes pulseBtn { 0%, 100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+
+    .animate-float { animation: float 5s ease-in-out infinite; }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+    .progress-header {
+      position: absolute; top: 12px; left: 0; width: 100%; padding: 0 12px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 150;
+    }
+    .logo-wrapped { height: 64px; width: auto; align-self: flex-start; flex-shrink: 0; }
+    .progress-container { width: 100%; display: flex; gap: 4px; }
+    .progress-bar { flex: 1; height: 2px; background: rgba(255,188,130,0.15); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #FFBC82; width: 0%; transition: width 0.3s linear; }
+
+  </style>
+</head>
+<body>
+
+  <div id="app-container">
+    <div class="fvc-background">
+      <div class="fvc-grid" id="bg-grid"></div>
+    </div>
+    
+    <canvas id="confetti-canvas"></canvas>
+    
+    <div id="band-overlay" class="transition-bands">
+       <div class="band band-1"></div>
+       <div class="band band-2"></div>
+       <div class="band band-3"></div>
+    </div>
+
+    <div class="progress-header">
+      <img src="https://i.ibb.co/35gwB6j2/logo-wrapped-fvc.png" class="logo-wrapped" alt="Logo FVC">
+      <div class="progress-container">
+        <div class="progress-bar"><div class="progress-fill" id="p0"></div></div>
+        <div class="progress-bar"><div class="progress-fill" id="p1"></div></div>
+        <div class="progress-bar"><div class="progress-fill" id="p2"></div></div>
+        <div class="progress-bar"><div class="progress-fill" id="p3"></div></div>
+        <div class="progress-bar"><div class="progress-fill" id="p4"></div></div>
+      </div>
+    </div>
+
+    <div id="slides-container">
+      <div class="slide active" id="slide-0" data-steps="0">
+        <div class="animate-float" style="margin-bottom: 1rem; margin-top: -2rem;"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#FF5EC9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+        <h1 class="gradient-text">EM DESTAQUE</h1>
+        <h2 style="margin-top: 1rem; font-size: clamp(1rem, 5vw, 1.5rem);">SUA RETROSPECTIVA<br>FVC WRAPPED 2025<br>CHEGOU!</h2>
+      </div>
+
+      <div class="slide" id="slide-1" data-steps="5">
+        <div class="step-wrapper">
+          <div class="step-item" id="s1-step-0">
+             <h2 class="text-pink">Aumenta o som,<br>CP CI+CA2!</h2>
+             <p class="step-desc">O ano de 2025 nem acabou, mas nossa "turnê" já quebrou recordes.</p>
+          </div>
+          <div class="step-item" id="s1-step-1">
+              <div class="text-pink animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="step-label">LOTAÇÃO MÁXIMA</div>
+              <div class="step-highlight">1200</div>
+              <p class="step-desc">Novos revendedores para o show em 2025.</p>
+          </div>
+          <div class="step-item" id="s1-step-2">
+              <div class="text-peach animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+              <div class="step-label">FÃ-CLUBE EM PESO</div>
+              <div class="step-highlight">5211</div>
+              <p class="step-desc">REs na base. 85% da rede.</p>
+          </div>
+          <div class="step-item" id="s1-step-3">
+              <div class="text-pink animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+              <div class="step-label">PERFORMANCE</div>
+              <div class="step-highlight">3</div>
+              <p class="step-desc">CPs tocando no ritmo da FVC.</p>
+          </div>
+          <div class="step-item" id="s1-step-4">
+              <div class="text-peach animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+              <div class="step-label">NO TOPO</div>
+              <div class="step-highlight">+3 p.p.</div>
+              <p class="step-desc">Resultado médio acima da rede.</p>
+          </div>
+          <div class="step-item" id="s1-step-5">
+               <div class="text-pink animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>
+               <div class="step-label">DISCO DE OURO</div>
+               <div class="step-highlight gradient-text" style="font-size: clamp(1.6rem, 7vw, 2.8rem);">R$ 70.355,00</div>
+               <p class="step-desc">GMV gerado com 15000 pedidos.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" id="slide-2" data-steps="5">
+        <div class="step-wrapper">
+           <div class="step-item" id="s2-step-0">
+              <h2 class="text-peach">Agora vamos falar<br>do seu ritmo,<br>CI+CA2.</h2>
+           </div>
+           <div class="step-item" id="s2-step-1">
+              <div class="text-pink animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#FF5EC9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+              <div class="step-label">SUA VIBE</div>
+              <div class="step-highlight pink">Ouro</div>
+              <p class="step-desc">Perfil que você trabalhou.</p>
+           </div>
+           <div class="step-item" id="s2-step-2">
+               <div class="text-peach animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#FFBC82" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+               <div class="step-label">PLAY NA ATIVAÇÃO</div>
+               <div class="step-highlight text-peach">82</div>
+               <p class="step-desc">REs ativadas na sua base.</p>
+           </div>
+           <div class="step-item" id="s2-step-3">
+              <div class="text-pink animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+              <div class="step-label">SUBINDO O NÍVEL</div>
+              <div class="step-highlight pink">0.6</div>
+              <p class="step-desc">Remix e upgrade de segmentação.</p>
+           </div>
+           <div class="step-item" id="s2-step-4">
+              <div class="text-peach animate-float"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>
+              <div class="step-label">FAIXA MAIS TOCADA</div>
+              <div class="step-highlight" style="font-size: clamp(1.4rem, 6vw, 2.2rem);">Florata</div>
+              <p class="step-desc">Queridinho da região.</p>
+           </div>
+           <div class="step-item" id="s2-step-5">
+              <div class="step-label">SUA BILHETERIA</div>
+              <div class="step-highlight gradient-text" style="font-size: clamp(1.6rem, 7vw, 2.8rem);">R$ 32.121,00</div>
+              <p class="step-desc">Parceria de valor! Boas Festas e um Feliz 2026!</p>
+           </div>
+        </div>
+      </div>
+
+      <div class="slide" id="slide-3" data-steps="0">
+        <div class="animate-float" style="margin-bottom: 1rem;"><svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#FFBC82" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        <h2 style="font-size: clamp(1.8rem, 8vw, 2.5rem);">Mas o show<br>não para por aí.</h2>
+        <p class="text-peach font-black" style="font-size: clamp(0.9rem, 4vw, 1.2rem); margin-top: 1rem; border-bottom: 2px solid #FF5EC9; padding-bottom: 4px;">TEM FAIXA BÔNUS!</p>
+      </div>
+
+      <div class="slide" id="slide-4" data-steps="0">
+        <div style="background: #000; width: 100%; aspect-ratio: 9/16; max-height: 45vh; border-radius: 2rem; border: 2px solid #FF5EC9; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+           <img src="https://picsum.photos/720/1280" style="position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.6;" />
+           <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;">
+              <div style="width: 50px; height: 50px; background: #FF5EC9; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px rgba(255,94,201,0.5);"><svg width="24" height="24" fill="white" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+           </div>
+           <div style="position: absolute; bottom: 15px; width: 100%; text-align: center; color: white; padding: 0 10px;">
+              <div style="font-weight: 800; font-size: 0.8rem;">MENSAGEM LIDERANÇA</div>
+           </div>
+        </div>
+        <button onclick="location.reload()" style="background: rgba(255,255,255,0.1); color: #F5F1EB; border: 2px solid rgba(255,255,255,0.2); padding: 8px 20px; border-radius: 99px; font-weight: 800; margin-top: 1.5rem; cursor: pointer; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px;">Recomeçar</button>
+      </div>
+    </div>
+
+    <button class="advance-btn" id="main-advance">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/></svg> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 11c.69 0 1.238.487 1.348 1.124l.002.126v2.75l.488.083c1.71.291 2.943 1.637 3.14 3.245l.022.272v1.4a4 4 0 0 1-3.8 3.995l-.2.005h-7a6 6 0 0 1-5.995-5.75L5 20.5v-7.25a1.25 1.25 0 0 1 2.493-.128l.007.128v5h1.25v-12c0-.69.548-1.25 1.226-1.25.617 0 1.13.415 1.25 1.002l.001.071-.001 7.177 1.25 0V3.25c0-.69.548-1.25 1.226-1.25.617 0 1.13.415 1.25 1.002l.001.071-.001 10.177 1.25 0V7.25c0-.69.548-1.25 1.226-1.25.617 0 1.13.415 1.25 1.002l.001.071v10.177l1.25 0v-7.25z"/></svg>
+      <span>Toque ou deslize</span>
+    </button>
+  </div>
+
+  <script>
+    let currentSlide = 0; let currentSubStep = 0; const totalSlides = 5; let isLocked = false;
+    const canvas = document.getElementById('confetti-canvas'); const ctx = canvas.getContext('2d');
+    const bandOverlay = document.getElementById('band-overlay');
+    const container = document.getElementById('app-container');
+    const advanceBtn = document.getElementById('main-advance');
+
+    function setupBackgroundGrid() {
+      const grid = document.getElementById('bg-grid');
+      const numColumns = 6;
+      const textsPerColumn = 25;
+      
+      for (let i = 0; i < numColumns; i++) {
+        const col = document.createElement('div');
+        col.className = 'fvc-column';
+        const scroll = document.createElement('div');
+        scroll.className = 'scroll-content';
+        
+        let content = '';
+        for (let j = 0; j < textsPerColumn; j++) {
+          content += '<span>FVC</span>';
+        }
+        scroll.innerHTML = content + content;
+        col.appendChild(scroll);
+        grid.appendChild(col);
+      }
+    }
+    setupBackgroundGrid();
+
+    function resize() { 
+      canvas.width = container.offsetWidth; 
+      canvas.height = container.offsetHeight; 
+    }
+    window.onresize = resize; resize();
+
+    const particles = [];
+    function createFestive() {
+      for (let i = 0; i < 120; i++) {
+        particles.push({
+          type: 'confetti',
+          x: Math.random() * canvas.width, y: canvas.height + 10,
+          w: Math.random() * 8 + 4, h: Math.random() * 8 + 4,
+          color: ['#FF5EC9', '#FFBC82', '#264FEC', '#F5F1EB'][Math.floor(Math.random() * 4)],
+          vx: Math.random() * 5 - 2.5, vy: -Math.random() * 14 - 10,
+          rot: Math.random() * 360, vr: Math.random() * 12 - 6
+        });
+      }
+    }
+
+    function updateParticles() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]; p.x += p.vx; p.y += p.vy; p.vy += 0.38; p.rot += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+        ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+        if (p.y > canvas.height + 50) particles.splice(i, 1);
+      }
+      if (particles.length > 0) requestAnimationFrame(updateParticles);
+    }
+
+    function triggerMacroTransition() {
+      bandOverlay.classList.remove('animate-bands');
+      void bandOverlay.offsetWidth;
+      bandOverlay.classList.add('animate-bands');
+    }
+
+    function updateUI() {
+      for (let i = 0; i < totalSlides; i++) {
+        const slide = document.getElementById('slide-' + i);
+        slide.classList.toggle('active', i === currentSlide);
+        if (i === currentSlide) {
+          const totalSteps = parseInt(slide.getAttribute('data-steps') || '0');
+          for (let s = 0; s <= totalSteps; s++) {
+            const stepEl = document.getElementById('s' + (i === 1 ? '1' : '2') + '-step-' + s);
+            if (stepEl) {
+              stepEl.classList.toggle('active', s === currentSubStep);
+              stepEl.classList.toggle('seen', s < currentSubStep);
+            }
+          }
+        }
+      }
+      for (let i = 0; i < totalSlides; i++) {
+        const fill = document.getElementById('p' + i);
+        if (i < currentSlide) fill.style.width = '100%';
+        else if (i === currentSlide) {
+          const steps = parseInt(document.getElementById('slide-' + i).getAttribute('data-steps') || '0');
+          fill.style.width = steps > 0 ? ((currentSubStep + 1) / (steps + 1) * 100) + '%' : '100%';
+        } else fill.style.width = '0%';
+      }
+      
+      advanceBtn.style.opacity = currentSlide === 0 ? '1' : '0';
+      advanceBtn.style.pointerEvents = currentSlide === 0 ? 'auto' : 'none';
+    }
+
+    function next() {
+      if (isLocked) return;
+      const slide = document.getElementById('slide-' + currentSlide);
+      const steps = parseInt(slide.getAttribute('data-steps') || '0');
+
+      if (steps > 0 && currentSubStep < steps) {
+        currentSubStep++; updateUI();
+      } else if (currentSlide < totalSlides - 1) {
+        const isFestive = currentSlide === 0 || currentSlide === 3;
+        if (isFestive) { 
+          createFestive(); updateParticles(); 
+          isLocked = true;
+          setTimeout(() => {
+            currentSlide++; currentSubStep = 0; updateUI();
+            isLocked = false;
+          }, 350);
+        } else {
+          triggerMacroTransition();
+          isLocked = true;
+          setTimeout(() => {
+            currentSlide++; currentSubStep = 0; updateUI();
+            isLocked = false;
+          }, 550);
+        }
+      }
+    }
+
+    function prev() {
+      if (isLocked) return;
+      if (currentSubStep > 0) { currentSubStep--; updateUI(); }
+      else if (currentSlide > 0) {
+        currentSlide--;
+        const steps = parseInt(document.getElementById('slide-' + currentSlide).getAttribute('data-steps') || '0');
+        currentSubStep = steps; updateUI();
+      }
+    }
+
+    advanceBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
+    container.addEventListener('click', (e) => {
+      if (e.target.closest('#main-advance')) return;
+      const rect = container.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      if (clickX > rect.width / 2) next(); else prev();
+    });
+    window.addEventListener('wheel', (e) => { if (Math.abs(e.deltaY) > 50) e.deltaY > 0 ? next() : prev(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ') next(); if (e.key === 'ArrowLeft') prev(); });
+    
+    updateUI();
+  </script>
+</body>
+</html>
